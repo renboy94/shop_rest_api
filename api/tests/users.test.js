@@ -2,6 +2,8 @@ process.env.NODE_ENV = "test";
 
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const User = require("../models/user");
 const MongoMemoryServer = require("mongodb-memory-server").default;
 
 // const User = require("./db/models/user").User;
@@ -27,6 +29,14 @@ beforeAll(async () => {
   await mongoose.connect(mongoUri, err => {
     if (err) console.error(err);
   });
+
+  const hash = await bcrypt.hash("password", 10);
+  const user = new User({
+    _id: new mongoose.Types.ObjectId(),
+    email: "duplicate@example.com",
+    password: hash
+  });
+  await user.save();
 });
 
 afterAll(async () => {
@@ -34,25 +44,41 @@ afterAll(async () => {
   await mongoServer.stop();
 });
 
-// describe("...", () => {
-//   it("...", async () => {
-//     const User = mongoose.model("User", new mongoose.Schema({ name: String }));
-//     const cnt = await User.count();
-//     // const cnt = await User.find();
-//     console.log(cnt);
-//     // expect(cnt).toEqual(1);
-//   });
-// });
-
 describe("/users", () => {
-  test("returns an error", async () => {
-    const response = await request(app).get("/userz");
-    expect(response.statusCode).toBe(404);
+  describe("/users/ - get users endpoint", () => {
+    test("returns an error", async () => {
+      const response = await request(app).get("/userz");
+      expect(response.statusCode).toBe(404);
+    });
+
+    test("returns the users", async () => {
+      const response = await request(app).get("/users");
+      expect(response.statusCode).toBe(200);
+      expect(response.body.users).toHaveLength(1);
+    });
   });
 
-  test("returns the users", async () => {
-    const response = await request(app).get("/users");
-    expect(response.statusCode).toBe(200);
+  describe("/users/signup - sign up a new user", () => {
+    test("returns an error for duplicate", async () => {
+      const response = await request(app)
+        .post("/users/signup")
+        .send({
+          email: "duplicate@example.com",
+          password: "password"
+        });
+      expect(response.statusCode).toBe(409);
+    });
+
+    test("returns the new registered user", async () => {
+      const response = await request(app)
+        .post("/users/signup")
+        .send({
+          email: "renboy@example.com",
+          password: "password"
+        });
+      expect(response.statusCode).toBe(201);
+      expect(response.body.user.email).toEqual("renboy@example.com");
+    });
   });
 });
 
