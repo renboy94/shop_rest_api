@@ -9,7 +9,7 @@ const MongoMemoryServer = require("mongodb-memory-server").default;
 
 const request = require("supertest");
 
-// const app = require("../../../app");
+const app = require("../../app");
 // const conn = require("../../../db/index");
 
 // import mongoose from "mongoose";
@@ -34,13 +34,25 @@ afterAll(async () => {
   await mongoServer.stop();
 });
 
-describe("...", () => {
-  it("...", async () => {
-    const User = mongoose.model("User", new mongoose.Schema({ name: String }));
-    const cnt = await User.count();
-    // const cnt = await User.find();
-    console.log(cnt);
-    // expect(cnt).toEqual(1);
+// describe("...", () => {
+//   it("...", async () => {
+//     const User = mongoose.model("User", new mongoose.Schema({ name: String }));
+//     const cnt = await User.count();
+//     // const cnt = await User.find();
+//     console.log(cnt);
+//     // expect(cnt).toEqual(1);
+//   });
+// });
+
+describe("/users", () => {
+  test("returns an error", async () => {
+    const response = await request(app).get("/userz");
+    expect(response.statusCode).toBe(404);
+  });
+
+  test("returns the users", async () => {
+    const response = await request(app).get("/users");
+    expect(response.statusCode).toBe(200);
   });
 });
 
