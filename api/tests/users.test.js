@@ -80,6 +80,57 @@ describe("/users", () => {
       expect(response.body.user.email).toEqual("renboy@example.com");
     });
   });
+
+  describe("/users/signin - signs in a user", () => {
+    test("returns an error for failed signin", async () => {
+      const response = await request(app)
+        .post("/users/signin")
+        .send({
+          email: "notexist@example.com",
+          password: "password"
+        });
+      expect(response.statusCode).toBe(401);
+      expect(response.body.message).toContain("Auth failed");
+    });
+
+    test("returns an access token", async () => {
+      const response = await request(app)
+        .post("/users/signin")
+        .send({
+          email: "duplicate@example.com",
+          password: "password"
+        });
+      const token = response.body.token;
+      const decoded = jwt.verify(token, process.env.JWT_KEY);
+      expect(response.statusCode).toBe(200);
+      expect(decoded.email).toEqual("duplicate@example.com");
+    });
+  });
+
+  describe("/users/:userId - deletes a user", () => {
+    test("returns the deleted user", async () => {
+      const response = await request(app)
+        .post("/users/signin")
+        .send({
+          email: "duplicate@example.com",
+          password: "password"
+        });
+      const token = response.body.token;
+      //   const id = response.body;
+      const decoded = jwt.verify(token, process.env.JWT_KEY);
+      //   console.log(decoded);
+
+      const deleteUser = await request(app)
+        .delete(`/users/${decoded.userId}`)
+        .set("Authorization", `Bearer ${token}`);
+
+      console.log(deleteUser.body);
+      //   const token = response.body.token;
+      //   const decoded = jwt.verify(token, process.env.JWT_KEY);
+      //   expect(response.statusCode).toBe(200);
+      //   expect(decoded.email).toEqual("duplicate@example.com");
+    });
+  });
 });
 
 // describe("POST /", () => {

@@ -1,7 +1,0 @@
-{
-  "env": {
-    "MLAB_USER": "renboy94",
-    "MLAB_PW": "renboy94",
-    "JWT_KEY": "secret"
-  }
-}
