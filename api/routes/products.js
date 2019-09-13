@@ -40,7 +40,7 @@ const upload = multer({
 
 const Product = require("../models/product");
 
-// router.get('/', ProductsController.products_get_all)
+router.get("/", ProductsController.products_get_all);
 
 router.post(
   "/",
@@ -49,10 +49,10 @@ router.post(
   ProductsController.products_create_product
 );
 
-// router.get('/', ProductsController.products_get_product)
+router.get("/:productId", ProductsController.products_get_product);
 
-// router.get('/', checkAuth, ProductsController.products_update_product)
+// router.get('/:productId', checkAuth, ProductsController.products_update_product)
 
-// router.get('/', checkAuth, ProductsController.products_delete_product)
+// router.get('/:productId', checkAuth, ProductsController.products_delete_product)
 
 module.exports = router;

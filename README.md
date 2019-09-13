@@ -1,2 +1,3 @@
-# shop_rest_api
+# Shop Rest Api
+
 Simple shop rest api
