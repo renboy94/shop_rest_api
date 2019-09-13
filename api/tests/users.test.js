@@ -1,25 +1,12 @@
 const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const MongoMemoryServer = require("mongodb-memory-server").default;
-
 const request = require("supertest");
+const app = require("../../app");
+const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
-const app = require("../../app");
-
-// May require additional time for downloading MongoDB binaries
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 600000;
-
-let mongoServer;
 
 beforeAll(async () => {
-  mongoServer = new MongoMemoryServer();
-  const mongoUri = await mongoServer.getConnectionString();
-  await mongoose.connect(mongoUri, err => {
-    if (err) console.error(err);
-  });
-
   const hash = await bcrypt.hash("password", 10);
   const user = new User({
     _id: new mongoose.Types.ObjectId(),
@@ -27,11 +14,6 @@ beforeAll(async () => {
     password: hash
   });
   await user.save();
-});
-
-afterAll(async () => {
-  await mongoose.disconnect();
-  await mongoServer.stop();
 });
 
 describe("/users", () => {
