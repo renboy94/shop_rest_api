@@ -60,7 +60,6 @@ describe("/orders", () => {
         .attach("productImage", `./testUploads/thor.jpg`);
 
       const newProductId = newProduct.body.createdProduct._id;
-      console.log(newProduct.body.createdProduct._id);
 
       const newOrder = await request(app)
         .post("/orders")
@@ -69,9 +68,73 @@ describe("/orders", () => {
           quantity: 1,
           productId: newProductId
         });
-      console.log(newOrder.body);
-      //   done();
-      //   expect(newOrder.statusCode).toBe(200);
+
+      expect(newOrder.statusCode).toBe(201);
+      expect(newOrder.body.createdOrder.quantity).toEqual(1);
+      expect(newOrder.body.message).toContain("Order stored");
+    });
+  });
+
+  describe("/orders - get a single order", () => {
+    test("returns a single order", async () => {
+      const newProduct = await request(app)
+        .post("/products")
+        .set("Authorization", `Bearer ${token}`)
+        .field("name", "thor")
+        .field("price", "12.99")
+        .attach("productImage", `./testUploads/thor.jpg`);
+
+      const newProductId = newProduct.body.createdProduct._id;
+
+      const newOrder = await request(app)
+        .post("/orders")
+        .set("Authorization", `Bearer ${token}`)
+        .send({
+          quantity: 1,
+          productId: newProductId
+        });
+
+      const orderId = newOrder.body.createdOrder._id;
+
+      const order = await request(app)
+        .get("/orders/" + orderId)
+        .set("Authorization", `Bearer ${token}`);
+
+      expect(order.statusCode).toBe(200);
+      expect(order.body.order.quantity).toEqual(1);
+      expect(order.body.order._id).toEqual(orderId);
+      expect(order.body.order.product._id).toEqual(newProductId);
+    });
+  });
+
+  describe("/orders - delete an order", () => {
+    test("returns deleted order", async () => {
+      const newProduct = await request(app)
+        .post("/products")
+        .set("Authorization", `Bearer ${token}`)
+        .field("name", "thor")
+        .field("price", "12.99")
+        .attach("productImage", `./testUploads/thor.jpg`);
+
+      const newProductId = newProduct.body.createdProduct._id;
+
+      const newOrder = await request(app)
+        .post("/orders")
+        .set("Authorization", `Bearer ${token}`)
+        .send({
+          quantity: 1,
+          productId: newProductId
+        });
+
+      const orderId = newOrder.body.createdOrder._id;
+
+      const deletedOrder = await request(app)
+        .delete("/orders/" + orderId)
+        .set("Authorization", `Bearer ${token}`);
+
+      expect(deletedOrder.statusCode).toBe(200);
+      expect(deletedOrder.body.deletedOrder.deletedCount).toEqual(1);
+      expect(deletedOrder.body.message).toContain("Order deleted");
     });
   });
 });
