@@ -41,16 +41,17 @@ afterAll(async done => {
 });
 
 describe("/products", () => {
-  describe("/producrs - get all products", () => {
+  describe("/products - get all products", () => {
     test("returns all products", async () => {
-      const newProduct = await request(app)
+      await request(app)
         .post("/products")
         .set("Authorization", `Bearer ${token}`)
         .field("name", "thor")
         .field("price", "12.99")
         .attach("productImage", `./testUploads/thor.jpg`);
+
       const response = await request(app).get("/products");
-      //   console.log(response.body);
+
       expect(response.statusCode).toBe(200);
       expect(response.body.count).toEqual(1);
     });
@@ -64,7 +65,9 @@ describe("/products", () => {
         .field("name", "thor")
         .field("price", "12.99")
         .attach("productImage", `./testUploads/thor.jpg`);
+
       const newProductBody = newProduct.body.createdProduct;
+
       expect(newProduct.statusCode).toBe(201);
       expect(newProductBody.name).toEqual("thor");
       expect(newProductBody.price).toEqual(12.99);
@@ -79,17 +82,41 @@ describe("/products", () => {
         .field("name", "thor")
         .field("price", "12.99")
         .attach("productImage", `./testUploads/thor.jpg`);
+
       const newProductBody = newProduct.body.createdProduct;
+
       const response = await request(app).get(
         "/products/" + newProductBody._id
       );
+
       expect(response.statusCode).toBe(200);
       expect(newProductBody.name).toEqual("thor");
       expect(newProductBody.price).toEqual(12.99);
     });
   });
 
-  describe("/products - update a product", () => {});
+  describe("/products - update a product", () => {
+    test("returns all products", async () => {
+      const newProduct = await request(app)
+        .post("/products")
+        .set("Authorization", `Bearer ${token}`)
+        .field("name", "thor")
+        .field("price", "12.99")
+        .attach("productImage", `./testUploads/thor.jpg`);
+
+      const updatedProduct = await request(app)
+        .patch("/products/" + newProduct.body.createdProduct._id)
+        .set("Authorization", `Bearer ${token}`)
+        .send({
+          name: "asgard",
+          price: 33.99
+        });
+
+      expect(updatedProduct.statusCode).toBe(200);
+      expect(updatedProduct.body.newProduct.nModified).toEqual(1);
+      expect(updatedProduct.body.message).toContain("Product updated");
+    });
+  });
 
   describe("/products - delete a product", () => {});
 });

@@ -79,3 +79,27 @@ exports.products_get_product = async (req, res, next) => {
     res.status(500).json({ error: err });
   }
 };
+
+exports.products_update_product = async (req, res, next) => {
+  const id = req.params.productId;
+  try {
+    const updatedProduct = await Product.updateOne(
+      { _id: id },
+      { $set: req.body }
+    );
+    res.status(200).json({
+      newProduct: updatedProduct,
+      message: "Product updated",
+      request: {
+        type: "PATCH",
+        url: "http://localhost:3007/products" + id
+      }
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: err
+    });
+  }
+};
+
+exports.products_delete_product = async (req, res, next) => {};
