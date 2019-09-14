@@ -118,5 +118,21 @@ describe("/products", () => {
     });
   });
 
-  describe("/products - delete a product", () => {});
+  describe("/products - delete a product", () => {
+    test("return deleted data", async () => {
+      const newProduct = await request(app)
+        .post("/products")
+        .set("Authorization", `Bearer ${token}`)
+        .field("name", "thor")
+        .field("price", "12.99")
+        .attach("productImage", `./testUploads/thor.jpg`);
+
+      const deletedProduct = await request(app)
+        .delete("/products/" + newProduct.body.createdProduct._id)
+        .set("Authorization", `Bearer ${token}`);
+      expect(deletedProduct.statusCode).toBe(200);
+      expect(deletedProduct.body.deletedProduct.deletedCount).toEqual(1);
+      expect(deletedProduct.body.message).toContain("Product deleted");
+    });
+  });
 });

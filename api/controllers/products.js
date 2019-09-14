@@ -102,4 +102,21 @@ exports.products_update_product = async (req, res, next) => {
   }
 };
 
-exports.products_delete_product = async (req, res, next) => {};
+exports.products_delete_product = async (req, res, next) => {
+  const id = req.params.productId;
+  try {
+    const deletedProduct = await Product.deleteOne({ _id: id });
+    res.status(200).json({
+      deletedProduct: deletedProduct,
+      message: "Product deleted",
+      request: {
+        type: "DELETE",
+        url: "http://localhost:3010/products/" + id
+      }
+    });
+  } catch (err) {
+    res.status(500).json({
+      error: err
+    });
+  }
+};
