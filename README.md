@@ -10,7 +10,7 @@ Clone the repo:
 git clone git@github.com:renboy94/shop_rest_api.git
 ```
 
-Install dependencies
+Install dependencies:
 
 ```
 npm install
