@@ -2,7 +2,7 @@
 
 Simple shop rest api
 
-##Setup
+## Setup
 
 Clone the repo:
 
