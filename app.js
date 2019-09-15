@@ -9,7 +9,7 @@ const productRoutes = require("./api/routes/products");
 const orderRoutes = require("./api/routes/orders");
 const userRoutes = require("./api/routes/users");
 
-const DB_URI = `mongodb://${process.env.MLAB_USER}:${process.env.MLAB_PW}@ds129821.mlab.com:29821/restapishop`;
+const DB_URI = `mongodb://${process.env.DB_USER}:${process.env.DB_PW}@ds129821.mlab.com:29821/restapishop`;
 
 mongoose.connect(DB_URI, { useNewUrlParser: true, useCreateIndex: true });
 mongoose.Promise = global.Promise;
